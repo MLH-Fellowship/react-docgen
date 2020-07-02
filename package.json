@@ -1,6 +1,6 @@
 {
   "name": "@MLH-Fellowship/react-native-docgen",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A CLI and toolkit to extract information from React components for documentation generation.",
   "repository": {
     "type": "git",
