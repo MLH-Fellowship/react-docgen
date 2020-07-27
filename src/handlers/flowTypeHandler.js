@@ -6,7 +6,7 @@
  *
  * @flow
  */
-
+import { type Parser } from '../babelParser';
 import { namedTypes as t } from '@motiz88/ast-types';
 import type Documentation from '../Documentation';
 import { unwrapUtilityType } from '../utils/flowUtilityTypes';
@@ -24,6 +24,7 @@ function setPropDescriptor(
   documentation: Documentation,
   path: NodePath,
   typeParams: ?TypeParameters,
+  parseInherits: boolean,
 ): void {
   if (t.ObjectTypeSpreadProperty.check(path.node)) {
     const argument = unwrapUtilityType(path.get('argument'));
@@ -33,7 +34,12 @@ function setPropDescriptor(
         documentation,
         argument,
         (propertyPath, innerTypeParams) => {
-          setPropDescriptor(documentation, propertyPath, innerTypeParams);
+          setPropDescriptor(
+            documentation,
+            propertyPath,
+            innerTypeParams,
+            parseInherits,
+          );
         },
         typeParams,
       );
@@ -47,7 +53,7 @@ function setPropDescriptor(
       // spread, but do resolve type aliases if they are defined in the same
       // file.
       // TODO: Make this configurable with a pragma comment?
-      false,
+      parseInherits,
     );
 
     if (resolvedPath && t.TypeAlias.check(resolvedPath.node)) {
@@ -56,7 +62,12 @@ function setPropDescriptor(
         documentation,
         right,
         (propertyPath, innerTypeParams) => {
-          setPropDescriptor(documentation, propertyPath, innerTypeParams);
+          setPropDescriptor(
+            documentation,
+            propertyPath,
+            innerTypeParams,
+            parseInherits,
+          );
         },
         typeParams,
       );
@@ -101,6 +112,8 @@ function setPropDescriptor(
 export default function flowTypeHandler(
   documentation: Documentation,
   path: NodePath,
+  parser: Parser,
+  parseInherits: boolean,
 ) {
   const flowTypesPath = getFlowTypeFromReactComponent(path);
 
@@ -112,7 +125,7 @@ export default function flowTypeHandler(
     documentation,
     flowTypesPath,
     (propertyPath, typeParams) => {
-      setPropDescriptor(documentation, propertyPath, typeParams);
+      setPropDescriptor(documentation, propertyPath, typeParams, parseInherits);
     },
   );
 }

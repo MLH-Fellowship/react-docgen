@@ -123,6 +123,7 @@ export type Handler = (
   documentation: Documentation,
   path: NodePath,
   parser: Parser,
+  parseInherits: boolean,
 ) => void;
 export type Resolver = (
   node: ASTNode,

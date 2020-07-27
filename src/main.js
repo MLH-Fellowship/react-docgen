@@ -47,6 +47,7 @@ function defaultParse(
   resolver?: ?Resolver,
   handlers?: ?Array<Handler>,
   options?: Options = {},
+  parseInherits: boolean,
 ): Array<DocumentationObject> | DocumentationObject {
   if (!resolver) {
     resolver = defaultResolver;
@@ -54,8 +55,7 @@ function defaultParse(
   if (!handlers) {
     handlers = defaultHandlers;
   }
-
-  return parse(String(src), resolver, handlers, options);
+  return parse(String(src), resolver, handlers, options, parseInherits);
 }
 
 export {

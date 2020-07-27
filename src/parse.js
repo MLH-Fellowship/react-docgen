@@ -18,12 +18,13 @@ function executeHandlers(
   handlers: Array<Handler>,
   componentDefinitions: Array<NodePath>,
   parser: Parser,
+  parseInherits: boolean,
 ): Array<DocumentationObject> {
   return componentDefinitions.map(
     (componentDefinition: NodePath): DocumentationObject => {
       const documentation = new Documentation();
       handlers.forEach(handler =>
-        handler(documentation, componentDefinition, parser),
+        handler(documentation, componentDefinition, parser, parseInherits),
       );
       return postProcessDocumentation(documentation.toObject());
     },
@@ -56,19 +57,29 @@ export default function parse(
   resolver: Resolver,
   handlers: Array<Handler>,
   options: Options,
+  parseInherits: boolean,
 ): Array<DocumentationObject> | DocumentationObject {
   const parser = buildParser(options);
   const ast = parser.parse(src);
   ast.__src = src;
   const componentDefinitions = resolver(ast, parser);
-
   if (Array.isArray(componentDefinitions)) {
     if (componentDefinitions.length === 0) {
       throw new Error(ERROR_MISSING_DEFINITION);
     }
-    return executeHandlers(handlers, componentDefinitions, parser);
+    return executeHandlers(
+      handlers,
+      componentDefinitions,
+      parser,
+      parseInherits,
+    );
   } else if (componentDefinitions) {
-    return executeHandlers(handlers, [componentDefinitions], parser)[0];
+    return executeHandlers(
+      handlers,
+      [componentDefinitions],
+      parser,
+      parseInherits,
+    )[0];
   }
 
   throw new Error(ERROR_MISSING_DEFINITION);
